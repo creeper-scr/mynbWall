@@ -491,7 +491,7 @@ async def handle():
         conn.close()
 
     await contributer.send("消息处理完毕")
-=======
+
     
     timestamp = int(time.time())
     directory = "submissions"  # 替换为你的目标目录
@@ -501,34 +501,34 @@ async def handle():
     # 确保目录存在，如果不存在则创建
     os.makedirs(directory, exist_ok=True)
 
+    os.makedirs(directory, exist_ok=True)
+
     # 在获取消息的上下文外打开文件，以保持文件打开状态
     with open(file_path, "a", encoding="utf-8") as file:
-        file.write("[\n")
-
-        first_message = True  # 用于跟踪是否是第一条消息
+        # 用于存储消息和 sessionID
+        messages = []
+        
         async for resp in get_content(timeout=10, retry=200, prompt=""):
             if resp is None:
                 await contributer.send("等待超时")
                 break
             
             message, sessionID = resp  # 解包消息和 sessionID
+            
+            # 将新消息包装为字典对象并添加到列表
+            messages.append({"message": str(message)})
 
-            # 如果不是第一条消息，前面添加逗号
-            if not first_message:
-                file.write(",\n")
-            else:
-                first_message = False
+        # 写入所有消息
+        file.write("[\n")
+        json.dump(messages, file, ensure_ascii=False)
+        file.write("\n")
 
-            # 将新消息包装为 JSON 对象并写入文件
-            json.dump({"message": str(message)}, file, ensure_ascii=False)
-
-        # 写入 sessionID，确保前面有逗号
+        # 写入 sessionID
         if sessionID:  # 检查 sessionID 是否存在
-            if not first_message:  # 如果已经写入过消息
-                file.write(",\n")
+            file.write(",\n")
             json.dump({"sessionID": str(sessionID)}, file, ensure_ascii=False)
 
-        file.write("\n]")  # 写入结尾的右方括号
+        file.write("\n]")  # 结束 JSON 数组
 
     await contributer.send(f"消息已保存到 {file_path}")  # 可选：告知用户文件已保存
     await gotohtml(file_path)
