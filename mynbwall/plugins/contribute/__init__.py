@@ -19,7 +19,7 @@ from jinja2 import Template
 from .config import Config
 
 require("imgrander")
-import onbwall.plugins.imgrander as imgrander
+import mynbwall.plugins.imgrander as imgrander
 
 __plugin_meta__ = PluginMetadata(
     name="contribute",
@@ -385,7 +385,7 @@ async def handle():
 
     async for resp in get_content(timeout=15, retry=200, prompt=""):
         if resp is None:
-            await contributer.send("等待超时")
+            await contributer.send("投稿时间结束")
             break
         print("resp")
         print(resp)
@@ -413,7 +413,7 @@ async def handle():
         }
 
         # 输出解析后的结果
-        await contributer.send(f"Simplified message: {simplified_data}")
+        
         print(f"Simplified message: {simplified_data}")
 
         user_id = session_id
@@ -530,7 +530,7 @@ async def handle():
 
         file.write("\n]")  # 结束 JSON 数组
 
-    await contributer.send(f"消息已保存到 {file_path}")  # 可选：告知用户文件已保存
     await gotohtml(file_path)
     await gotojpg(file_path)
+    
 
